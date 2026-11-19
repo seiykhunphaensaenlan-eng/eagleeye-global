@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+ content="width=device-width, initial-scale=1">
+<title>EagleEye Big C PLUS - 100 Products</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#06132c;color:white;
+ font-family:Arial,sans-serif;
+}
+header{
+ text-align:center;padding:25px 12px;
+ background:linear-gradient(135deg,#06132c,#16417b);
+ border-bottom:3px solid gold;
+}
+h1{color:#ffd76a}
+nav{text-align:center;padding:15px}
+nav a,.btn{
+ display:inline-block;background:#d6ad45;
+ color:#06132c;padding:11px 16px;
+ border:0;border-radius:9px;
+ text-decoration:none;font-weight:bold;
+ cursor:pointer;margin:4px;
+}
+main{
+ max-width:1400px;margin:auto;
+ padding:15px;
+}
+#products{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+ gap:15px;
+}
+.card{
+ background:#102b55;
+ border:1px solid #d6ad45;
+ border-radius:14px;
+ padding:16px;
+}
+.card h3{color:#ffd76a;margin-top:0}
+.card input{
+ display:block;width:100%;padding:10px;
+ margin:9px 0;border-radius:6px;
+ border:1px solid #8799b5;
+}
+.card a{
+ display:inline-block;color:#06132c;
+ background:#ffd76a;padding:10px;
+ border-radius:8px;text-decoration:none;
+ margin-top:6px;
+}
+.note{text-align:center;color:#ddd}
+</style>
+</head>
+<body>
+<header>
+<h1>🦅 EagleEye Global Shopping</h1>
+<h2>Big C PLUS - 100 Products</h2>
+<p>โรงงานเตรียมสินค้า Affiliate 100 รายการ</p>
+</header>
+
+<nav>
+<a href="../eagleeye_bigc.html">หน้า Big C PLUS</a>
+<a href="../eagleeye_shopping.html">หน้าช้อปปิ้ง</a>
+<button class="btn" onclick="exportData()">
+สำรองข้อมูล JSON
+</button>
+</nav>
+
+<main>
+<p class="note">
+กรอกข้อมูลสินค้า แล้วกดบันทึกแต่ละรายการ
+</p>
+<section id="products"></section>
+</main>
+
+<script>
+const storageKey="eagleeye_bigc_100_v1";
+let products=[];
+
+try{
+ products=JSON.parse(
+  localStorage.getItem(storageKey)||"[]"
+ );
+ if(!Array.isArray(products))products=[];
+}catch(e){products=[];}
+
+const area=document.getElementById("products");
+
+function saveProduct(i){
+ const card=document.getElementById("p"+i);
+ const inputs=card.querySelectorAll("input");
+ const item={
+  name:inputs[0].value,
+  price:inputs[1].value,
+  commission:inputs[2].value,
+  image:inputs[3].value,
+  link:inputs[4].value
+ };
+ products[i]=item;
+ try{
+  localStorage.setItem(
+   storageKey,JSON.stringify(products)
+  );
+  alert("บันทึกรายการ "+(i+1)+" แล้ว");
+ }catch(e){
+  alert("บันทึกไม่สำเร็จ กรุณาสำรองข้อมูล");
+ }
+}
+
+function exportData(){
+ const blob=new Blob(
+  [JSON.stringify(products,null,2)],
+  {type:"application/json"}
+ );
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;
+ a.download="bigc_100_backup.json";
+ a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+for(let i=0;i<100;i++){
+ const p=products[i]||{};
+ const card=document.createElement("article");
+ card.className="card";
+ card.id="p"+i;
+
+ const heading=document.createElement("h3");
+ heading.textContent="สินค้า "+String(i+1).padStart(3,"0");
+ card.appendChild(heading);
+
+ const fields=[
+  ["name","ชื่อสินค้า"],
+  ["price","ราคา (บาท)"],
+  ["commission","ค่าคอมมิชชัน (%)"],
+  ["image","ลิงก์รูปภาพ"],
+  ["link","ลิงก์ Affiliate"]
+ ];
+
+ fields.forEach(([key,label])=>{
+  const input=document.createElement("input");
+  input.placeholder=label;
+  input.setAttribute("aria-label",label);
+  input.value=p[key]||"";
+  card.appendChild(input);
+ });
+
+ const button=document.createElement("button");
+ button.className="btn";
+ button.textContent="บันทึกสินค้า";
+ button.onclick=()=>saveProduct(i);
+ card.appendChild(button);
+
+ const link=document.createElement("a");
+ link.textContent="ดูสินค้า";
+ link.target="_blank";
+ link.rel="noopener noreferrer";
+ const savedLink=p.link||"";
+ if(/^https?:\/\//i.test(savedLink)){
+  link.href=savedLink;
+ }else{
+  link.style.display="none";
+ }
+ card.appendChild(link);
+
+ area.appendChild(card);
+}
+</script>
+</body>
+</html>
